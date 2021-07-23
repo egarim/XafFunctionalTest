@@ -117,20 +117,18 @@ namespace FunctionalTest
             Assert.AreEqual(false,SecurityFromApp.CanCreate<Customer>());
             Assert.AreEqual(false, SecurityFromApp.CanWrite<Customer>());
             Assert.AreEqual(false, SecurityFromApp.CanDelete<Customer>());
+            //HACK navigation permissions should be explicitly denied otherwise it will return true
             Assert.AreEqual(false, SecurityFromApp.CanNavigate("Application/NavigationItems/Items/Default/Items/Customer_ListView"));
 
 
         }
         [Test]
-        public void AdminShouldNotBeAbleToCreateCustomer()
+        public void AdminShouldBeAbleToCreateCustomer()
         {
 
-            SecurityStrategyComplex security = Login("Admin", "");
+            Login("Admin", "");
 
             IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
-            SecurityStrategy SecurityFromApp = application.GetSecurityStrategy();
-
-
 
             var Customer = objectSpace.CreateObject<Customer>();
             objectSpace.CommitChanges();
