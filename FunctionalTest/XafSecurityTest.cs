@@ -41,7 +41,10 @@ namespace FunctionalTest
 
             //Create an instance of the test application (this application is a core application and is not bound to any U.I platform)
             application = new TestApplication();
+
             nonSecureObjectSpaceProvider = new XPObjectSpaceProvider(dataStoreProvider);
+
+
             XafFunctionalTestModule xafFunctionalTestModule = new XafFunctionalTestModule();
             application.Modules.Add(xafFunctionalTestModule);
 
@@ -83,6 +86,8 @@ namespace FunctionalTest
 
             SecurityStrategyComplex security = Login("User", "");
 
+           
+
             IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
             SecurityStrategy SecurityFromApp = application.GetSecurityStrategy();
 
@@ -103,10 +108,7 @@ namespace FunctionalTest
             Assert.AreEqual(Exception.Message, "Saving the 'XafFunctionalTest.Module.BusinessObjects.Customer' object is prohibited by security rules.");
 
 
-            //target = new FakeAppearanceTarget();
-            //controller = new AppearanceController();
-            //detailView = application.CreateDetailView(objectSpace, Customer);
-            //controller.SetView(detailView);
+          
         }
         [Test]
         public void CheckIsCreateOperationIsAllow()
@@ -114,6 +116,7 @@ namespace FunctionalTest
 
             Login("User", "");
             SecurityStrategy SecurityFromApp = application.GetSecurityStrategy();
+
             Assert.AreEqual(false,SecurityFromApp.CanCreate<Customer>());
             Assert.AreEqual(false, SecurityFromApp.CanWrite<Customer>());
             Assert.AreEqual(false, SecurityFromApp.CanDelete<Customer>());
@@ -132,6 +135,9 @@ namespace FunctionalTest
 
             var Customer = objectSpace.CreateObject<Customer>();
             objectSpace.CommitChanges();
+
+            var CustomerFromDatabase=objectSpace.FindObject<Customer>(null);
+
             Assert.Pass();
         }
 
@@ -148,7 +154,7 @@ namespace FunctionalTest
             SecurityStrategy.EnableSecurityForActions = true;
             SecurityStrategyComplex security = Login("Admin", "");
         
-            IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
+          
 
             var SecuredActions= security.GetSecuredActions();
 

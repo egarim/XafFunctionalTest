@@ -6,6 +6,7 @@ using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 
 using NUnit.Framework;
+using System.Drawing;
 using XafFunctionalTest.Module.BusinessObjects;
 
 namespace FunctionalTest
@@ -13,7 +14,7 @@ namespace FunctionalTest
     public class ConditionalAppearanceTest
     {
         private Customer Customer;
-        private FakeAppearanceTarget target;
+        private TestAppearanceTarget target;
         private AppearanceController controller;
         private DetailView detailView;
         private IObjectSpace objectSpace;
@@ -30,7 +31,7 @@ namespace FunctionalTest
             application.Setup("TestApplication", objectSpaceProvider);
             IObjectSpace objectSpace = objectSpaceProvider.CreateObjectSpace();
             Customer = objectSpace.CreateObject<Customer>();
-            target = new FakeAppearanceTarget();
+            target = new TestAppearanceTarget();
             controller = new AppearanceController();
             detailView = application.CreateDetailView(objectSpace, Customer);
             controller.SetView(detailView);
@@ -46,6 +47,12 @@ namespace FunctionalTest
             Customer.Active = false;
             controller.RefreshItemAppearance(detailView, "ViewItem", "MaxCredit", target, Customer);
             Assert.IsFalse(target.Enabled);
+            Assert.AreEqual(Color.Red ,target.BackColor);
+
+
+
+
+
         }
        
   

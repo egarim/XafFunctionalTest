@@ -94,7 +94,7 @@ namespace XafFunctionalTest.Module.DatabaseUpdate {
                 
                 //HACK navigation permissions should be explicitly denied otherwise it will return true
                 defaultRole.AddNavigationPermission("Application/NavigationItems/Items/Default/Items/Customer_ListView", SecurityPermissionState.Deny);
-                //HACK add  (denied) action permission
+                //HACK add  (denied) action permission 20>
                 defaultRole.AddActionPermission(CustomerController.CustomerActionId);
             
             }
