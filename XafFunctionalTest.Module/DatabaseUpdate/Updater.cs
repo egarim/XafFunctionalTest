@@ -12,6 +12,7 @@ using DevExpress.ExpressApp.Xpo;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.BaseImpl.PermissionPolicy;
 using XafFunctionalTest.Module.BusinessObjects;
+using XafFunctionalTest.Module.Controllers;
 
 namespace XafFunctionalTest.Module.DatabaseUpdate {
     // For more typical usage scenarios, be sure to check out https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Updating.ModuleUpdater
@@ -78,7 +79,7 @@ namespace XafFunctionalTest.Module.DatabaseUpdate {
 
                 //HACK deny all permissions for functional test
                 defaultRole.PermissionPolicy = SecurityPermissionPolicy.DenyAllByDefault;
-
+               
                 defaultRole.Name = "Default";
 
 				defaultRole.AddObjectPermissionFromLambda<PermissionPolicyUser>(SecurityOperations.Read, cm => cm.Oid == (Guid)CurrentUserIdOperator.CurrentUserId(), SecurityPermissionState.Allow);
@@ -90,6 +91,12 @@ namespace XafFunctionalTest.Module.DatabaseUpdate {
                 defaultRole.AddTypePermissionsRecursively<ModelDifferenceAspect>(SecurityOperations.ReadWriteAccess, SecurityPermissionState.Allow);
 				defaultRole.AddTypePermissionsRecursively<ModelDifference>(SecurityOperations.Create, SecurityPermissionState.Allow);
                 defaultRole.AddTypePermissionsRecursively<ModelDifferenceAspect>(SecurityOperations.Create, SecurityPermissionState.Allow);
+                
+                //HACK navigation permissions should be explicitly denied otherwise it will return true
+                defaultRole.AddNavigationPermission("Application/NavigationItems/Items/Default/Items/Customer_ListView", SecurityPermissionState.Deny);
+                //HACK add  (denied) action permission
+                defaultRole.AddActionPermission(CustomerController.CustomerActionId);
+            
             }
             return defaultRole;
         }

@@ -12,6 +12,7 @@ using NUnit.Framework;
 using System;
 using XafFunctionalTest.Module;
 using XafFunctionalTest.Module.BusinessObjects;
+using XafFunctionalTest.Module.Controllers;
 using XafFunctionalTest.Module.DatabaseUpdate;
 
 namespace FunctionalTest
@@ -19,10 +20,7 @@ namespace FunctionalTest
     public class XafSecurityTest
     {
 
-        private Customer Customer;
-        private FakeAppearanceTarget target;
-        private AppearanceController controller;
-        private DetailView detailView;
+   
         SecurityStrategyComplex security;
         SecuredObjectSpaceProvider secureobjectSpaceProvider;
         TestApplication application;
@@ -80,7 +78,7 @@ namespace FunctionalTest
         }
 
         [Test]
-        public void TestRoles()
+        public void UserShouldNotBeAbleToCreateCustomer()
         {
 
             SecurityStrategyComplex security = Login("User", "");
@@ -88,28 +86,43 @@ namespace FunctionalTest
             IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
             SecurityStrategy SecurityFromApp = application.GetSecurityStrategy();
 
-          
 
-            Assert.Throws<UserFriendlyObjectLayerSecurityException>
-            (
-              () =>
-              {
-                  Customer = objectSpace.CreateObject<Customer>();
-                  objectSpace.CommitChanges();
+            //HACK assert exception 
+            var Exception = Assert.Throws<UserFriendlyObjectLayerSecurityException>
+             (
+               () =>
+               {
+                   var Customer = objectSpace.CreateObject<Customer>();
+                   objectSpace.CommitChanges();
 
-              }
+               }
 
-            );
+             );
 
-           
-         
+            //HACK assert exception message
+            Assert.AreEqual(Exception.Message, "Saving the 'XafFunctionalTest.Module.BusinessObjects.Customer' object is prohibited by security rules.");
+
+
             //target = new FakeAppearanceTarget();
             //controller = new AppearanceController();
             //detailView = application.CreateDetailView(objectSpace, Customer);
             //controller.SetView(detailView);
         }
         [Test]
-        public void TestRoles2()
+        public void CheckIsCreateOperationIsAllow()
+        {
+
+            Login("User", "");
+            SecurityStrategy SecurityFromApp = application.GetSecurityStrategy();
+            Assert.AreEqual(false,SecurityFromApp.CanCreate<Customer>());
+            Assert.AreEqual(false, SecurityFromApp.CanWrite<Customer>());
+            Assert.AreEqual(false, SecurityFromApp.CanDelete<Customer>());
+            Assert.AreEqual(false, SecurityFromApp.CanNavigate("Application/NavigationItems/Items/Default/Items/Customer_ListView"));
+
+
+        }
+        [Test]
+        public void AdminShouldNotBeAbleToCreateCustomer()
         {
 
             SecurityStrategyComplex security = Login("Admin", "");
@@ -119,9 +132,62 @@ namespace FunctionalTest
 
 
 
-            Customer = objectSpace.CreateObject<Customer>();
+            var Customer = objectSpace.CreateObject<Customer>();
             objectSpace.CommitChanges();
             Assert.Pass();
+        }
+
+
+
+        [Test]
+        public void SecurityInActions()
+        {
+            //HACK enable security for actions
+            //https://community.devexpress.com/blogs/xaf/archive/2020/05/04/xaf-permissions-for-ui-actions-and-security-system-for-non-xaf-apps-powered-by-entity-framework-core-3-v20-1.aspx
+            //https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.EnableSecurityForActions
+
+            //HACK security strategy https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy._members
+            SecurityStrategy.EnableSecurityForActions = true;
+            SecurityStrategyComplex security = Login("Admin", "");
+        
+            IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
+
+            var SecuredActions= security.GetSecuredActions();
+
+            Assert.AreEqual(true, security.IsSecuredAction(CustomerController.CustomerActionId));
+
+
+
+        }
+        [Test]
+        public void ActiveActions()
+        {
+            //HACK enable security for actions
+            //https://community.devexpress.com/blogs/xaf/archive/2020/05/04/xaf-permissions-for-ui-actions-and-security-system-for-non-xaf-apps-powered-by-entity-framework-core-3-v20-1.aspx
+            //https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.EnableSecurityForActions
+
+            //HACK security strategy https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy._members
+            SecurityStrategy.EnableSecurityForActions = false;
+            SecurityStrategyComplex security = Login("Admin", "");
+
+
+
+            IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
+
+            var Customer = objectSpace.CreateObject<Customer>();
+            Customer.Active = false;
+            var controller = new CustomerController();
+            var detailView = application.CreateDetailView(objectSpace, Customer);
+           
+            controller.SetView(detailView);
+
+            //detailView.Refresh();
+
+            //detailView.CurrentObject = Customer;
+
+            bool resultValue = controller.Actions[CustomerController.CustomerActionId].Active.ResultValue;
+
+            Assert.AreEqual(false, resultValue);
         }
 
     }
