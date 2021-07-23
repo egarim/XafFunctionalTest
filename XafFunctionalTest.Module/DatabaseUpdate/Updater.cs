@@ -73,7 +73,12 @@ namespace XafFunctionalTest.Module.DatabaseUpdate {
         private PermissionPolicyRole CreateDefaultRole() {
             PermissionPolicyRole defaultRole = ObjectSpace.FirstOrDefault<PermissionPolicyRole>(role => role.Name == "Default");
             if(defaultRole == null) {
+                
                 defaultRole = ObjectSpace.CreateObject<PermissionPolicyRole>();
+
+                //HACK deny all permissions for functional test
+                defaultRole.PermissionPolicy = SecurityPermissionPolicy.DenyAllByDefault;
+
                 defaultRole.Name = "Default";
 
 				defaultRole.AddObjectPermissionFromLambda<PermissionPolicyUser>(SecurityOperations.Read, cm => cm.Oid == (Guid)CurrentUserIdOperator.CurrentUserId(), SecurityPermissionState.Allow);
