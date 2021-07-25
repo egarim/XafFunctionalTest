@@ -138,7 +138,7 @@ namespace FunctionalTest
 
             var CustomerFromDatabase=objectSpace.FindObject<Customer>(null);
 
-            Assert.Pass();
+            Assert.NotNull(CustomerFromDatabase);
         }
 
 
@@ -153,11 +153,12 @@ namespace FunctionalTest
             //HACK security strategy https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy._members
             SecurityStrategy.EnableSecurityForActions = true;
             SecurityStrategyComplex security = Login("Admin", "");
-        
-          
 
-            var SecuredActions= security.GetSecuredActions();
 
+            //HACK get secured actions is missing the description in the documentation https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.GetSecuredActions
+            var SecuredActions = security.GetSecuredActions();
+
+            //HACK is secured action is missing the description in the documentation https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.IsSecuredAction(System.String)
             Assert.AreEqual(true, security.IsSecuredAction(CustomerController.CustomerActionId));
 
 
