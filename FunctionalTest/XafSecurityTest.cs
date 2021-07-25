@@ -1,8 +1,10 @@
 using DevExpress.Data.Linq.Helpers;
 using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.Actions;
 using DevExpress.ExpressApp.ConditionalAppearance;
 using DevExpress.ExpressApp.Security;
 using DevExpress.ExpressApp.Security.ClientServer;
+using DevExpress.ExpressApp.SystemModule;
 using DevExpress.ExpressApp.Xpo;
 using DevExpress.Persistent.BaseImpl.PermissionPolicy;
 using DevExpress.Persistent.Validation;
@@ -165,27 +167,39 @@ namespace FunctionalTest
 
         }
         [Test]
-        public void CheckIfAnActionIsActiveDependingOnTheObjectState()
+        public void CheckIfAnActionIsEnableDependingOnTheObjectState()
         {
+            //HACK https://supportcenter.devexpress.com/ticket/details/t853927/how-to-unit-test-action-s-enabled-disabled-state-based-on-target-criteria-and-selection
             
+            //Login
             SecurityStrategyComplex security = Login("Admin", "");
-
-
 
             IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
 
+
             var Customer = objectSpace.CreateObject<Customer>();
-            Customer.Active = false;
-            var controller = new CustomerController();
-            var detailView = application.CreateDetailView(objectSpace, Customer);
-           
-            controller.SetView(detailView);
+            Customer.Active = true;
+            
+            //Controllers
+            var CustomerController = new CustomerController();
 
-          
+            //HACK xaf list of controllers https://docs.devexpress.com/eXpressAppFramework/113016/ui-construction/controllers-and-actions/built-in-controllers-and-actions
+            //HACK ActionsCriteriaViewController https://docs.devexpress.com/eXpressAppFramework/113141/ui-construction/controllers-and-actions/built-in-controllers-and-actions/built-in-controllers-and-actions-in-the-system-module#actionscriteriaviewcontroller
+            ActionsCriteriaViewController actionsCriteriaViewController = new ActionsCriteriaViewController();
 
-            bool resultValue = controller.Actions[CustomerController.CustomerActionId].Active.ResultValue;
+            DetailView DetailView = new DetailView(objectSpace, Customer, application, true);
 
-            Assert.AreEqual(false, resultValue);
+            //HACK frames and windows https://docs.devexpress.com/eXpressAppFramework/112608/ui-construction/windows-and-frames
+            //HACK frames https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Frame
+
+            //Set view and controllers to the frame
+            Frame frame = new Frame(this.application, TemplateContext.View, actionsCriteriaViewController, CustomerController);
+            frame.SetView(DetailView);
+            
+            
+            var CustomerAction = CustomerController.Actions[CustomerController.CustomerActionId] as SimpleAction;
+
+            Assert.AreEqual(false, CustomerAction.Enabled.ResultValue);
         }
 
     }
