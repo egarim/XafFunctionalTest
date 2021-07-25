@@ -153,15 +153,14 @@ namespace FunctionalTest
             //https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.EnableSecurityForActions
 
             //HACK security strategy https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy._members
+           
+            SecurityStrategyComplex security = Login("User", "");
             SecurityStrategy.EnableSecurityForActions = true;
-            SecurityStrategyComplex security = Login("Admin", "");
 
+            //the action CustomerController.CustomerActionId was added to the secure actions in the method CreateDefaultRole of the updater class in the agnostic module
 
-            //HACK get secured actions is missing the description in the documentation https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.GetSecuredActions
-            var SecuredActions = security.GetSecuredActions();
-
-            //HACK is secured action is missing the description in the documentation https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.IsSecuredAction(System.String)
-            Assert.AreEqual(true, security.IsSecuredAction(CustomerController.CustomerActionId));
+            bool actual = security.CanExecute(CustomerController.CustomerActionId);
+            Assert.AreEqual(false, actual);
 
 
 
