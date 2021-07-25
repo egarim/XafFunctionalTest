@@ -24,7 +24,7 @@ namespace FunctionalTest
 
    
         SecurityStrategyComplex security;
-        SecuredObjectSpaceProvider secureobjectSpaceProvider;
+        SecuredObjectSpaceProvider secureObjectSpaceProvider;
         TestApplication application;
         XPObjectSpaceProvider nonSecureObjectSpaceProvider;
         MemoryDataStoreProvider dataStoreProvider;
@@ -77,7 +77,9 @@ namespace FunctionalTest
 
             authentication.SetLogonParameters(new AuthenticationStandardLogonParameters(userName, password));
             security.Logon(LoginObjectSpace);
-            secureobjectSpaceProvider = new SecuredObjectSpaceProvider(this.security, dataStoreProvider);
+            secureObjectSpaceProvider = new SecuredObjectSpaceProvider(this.security, dataStoreProvider);
+
+         
             application.Security = security;
             return security;
         }
@@ -88,9 +90,10 @@ namespace FunctionalTest
 
             SecurityStrategyComplex security = Login("User", "");
 
-           
 
-            IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
+          
+
+            IObjectSpace objectSpace = secureObjectSpaceProvider.CreateObjectSpace();
             SecurityStrategy SecurityFromApp = application.GetSecurityStrategy();
 
 
@@ -133,7 +136,7 @@ namespace FunctionalTest
 
             Login("Admin", "");
 
-            IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
+            IObjectSpace objectSpace = secureObjectSpaceProvider.CreateObjectSpace();
 
             var Customer = objectSpace.CreateObject<Customer>();
             objectSpace.CommitChanges();
@@ -173,7 +176,7 @@ namespace FunctionalTest
             //Login
             SecurityStrategyComplex security = Login("Admin", "");
 
-            IObjectSpace objectSpace = secureobjectSpaceProvider.CreateObjectSpace();
+            IObjectSpace objectSpace = secureObjectSpaceProvider.CreateObjectSpace();
 
 
             var Customer = objectSpace.CreateObject<Customer>();
