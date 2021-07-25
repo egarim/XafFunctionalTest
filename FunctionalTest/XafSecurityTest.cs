@@ -165,14 +165,9 @@ namespace FunctionalTest
 
         }
         [Test]
-        public void ActiveActions()
+        public void CheckIfAnActionIsActiveDependingOnTheObjectState()
         {
-            //HACK enable security for actions
-            //https://community.devexpress.com/blogs/xaf/archive/2020/05/04/xaf-permissions-for-ui-actions-and-security-system-for-non-xaf-apps-powered-by-entity-framework-core-3-v20-1.aspx
-            //https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy.EnableSecurityForActions
-
-            //HACK security strategy https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Security.SecurityStrategy._members
-            SecurityStrategy.EnableSecurityForActions = false;
+            
             SecurityStrategyComplex security = Login("Admin", "");
 
 
@@ -186,9 +181,7 @@ namespace FunctionalTest
            
             controller.SetView(detailView);
 
-            //detailView.Refresh();
-
-            //detailView.CurrentObject = Customer;
+          
 
             bool resultValue = controller.Actions[CustomerController.CustomerActionId].Active.ResultValue;
 
