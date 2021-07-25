@@ -35,6 +35,7 @@ namespace XafFunctionalTest.Module.Controllers
             CustomerAction.TargetObjectsCriteriaMode = TargetObjectsCriteriaMode.TrueAtLeastForOne;
             CustomerAction.TargetViewType = ViewType.DetailView;
             CustomerAction.TargetViewNesting = Nesting.Any;
+            
             // Target required Views (via the TargetXXX properties) and create their Actions.
         }
         private void CustomerAction_Execute(object sender, SimpleActionExecuteEventArgs e)
